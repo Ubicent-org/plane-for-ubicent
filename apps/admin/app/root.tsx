@@ -49,6 +49,28 @@ export function Layout({ children }: { children: ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                window.requestIdleCallback = window.requestIdleCallback || function(cb, options) {
+                  var start = Date.now();
+                  return setTimeout(function() {
+                    cb({
+                      didTimeout: false,
+                      timeRemaining: function() {
+                        return Math.max(0, 50 - (Date.now() - start));
+                      }
+                    });
+                  }, options && options.timeout || 1);
+                };
+                window.cancelIdleCallback = window.cancelIdleCallback || function(id) {
+                  clearTimeout(id);
+                };
+              }
+            `,
+          }}
+        />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <AppProviders>{children}</AppProviders>
